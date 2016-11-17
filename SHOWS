@@ -1,0 +1,84 @@
+# This is the sample SHOWS file.
+# If you create a file named SHOWS.local, it will be used instead
+# of this file (and .local files won't conflict with future updates)
+
+# Format:
+# One show per line
+# Shows are matched by prefix
+# Matching is case insensitive
+# start-of-line comments are allowed
+# blank lines are allowed
+
+# Longer lived shows
+12 Monkeys
+American Horror Story
+Z Nation
+Lucifer
+Black Mirror
+iZombie
+The Simpsons
+Family Guy
+South Park
+Whose Line
+Penn and Teller
+Last Week
+Real Time
+Saturday Night Live
+Adventure Time
+Steven Universe
+Brooklyn
+American Dad
+Billions
+Dr Ken
+Hollywood Game
+The Magicians
+The Real ONeals
+How to Get Away with Murder
+Better Call Saul
+Chicago Med
+The Shannara
+The Librarians
+Doctor Who
+Jessica Jones
+Ash vs Evil Dead
+Please Like Me
+Blunt Talk
+Last Week Tonight
+Rosewood
+VICE
+Full Frontal
+Superstore
+House of Cards
+Unbreakable Kimmy
+The Strain
+My Little
+Voltron
+
+# New 2016 Shows
+Designated Survivor
+Class
+Incorporated
+The Good Place
+Channel Zero
+Timeless
+No Tomorrow
+Dirk Gentlys Holistic Detective Agency
+Braindead
+American Gods
+Son of Zorn
+People of Earth
+Westworld
+Stan Against Evil
+Tutankhamun
+Chance
+Salvation
+
+# Final Season Shows
+The Leftovers
+The Vampire Diaries
+Teen Wolf
+
+# Shows not existing yet
+Criminal Magic
+Stranger in a Strange Land
+The Building
