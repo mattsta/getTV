@@ -345,7 +345,8 @@ class TVTorrentController:
         # has been previously downloaded. Typically gets posted a few days
         # to a week after the original TV airing
         # (as happens with southpark, mr robot, etc).
-        uncensoredMatch = re.search(r"UNCENSORED", filename)
+        uncensoredMatch = re.search(r"UNCENSORED", filename,
+                                    flags=re.IGNORECASE)
         if uncensoredMatch:
             uncensored = True
 
