@@ -124,6 +124,11 @@ class TorrentApiController:
                 time.sleep(5)
                 continue
 
+            if r.status_code == requests.codes.too_many_requests:
+                print("Server denied token (known error). Retrying...")
+                time.sleep(5)
+                continue
+
             try:
                 j = r.json()
             except BaseException:
