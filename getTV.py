@@ -326,6 +326,10 @@ class TVTorrentController:
         Stephen.Colbert.2016.09.01.Larry.Wilmore.720p.CBS.WEBRip.AAC2.0.x264-RTN
         The.Simpsons.S27E21.WEST.FEED.720p.HDTV.x264-BATV[rartv]
         Mr.Robot.S02E07.UNCENSORED.1080p.WEB.X264-DEFLATE[rartv]
+
+        Updated to verify these two filenames are detected as the same episode:
+        Will.and.Grace.S10E13.720p.HDTV.x264-LucidTV[rarbg]
+        Will.And.Grace.S10E13.iNTERNAL.720p.WEB.h264-BAMBOOZLE[rarbg]
         """
         show = None
         episode = None
@@ -398,7 +402,13 @@ class TVTorrentController:
         if westLiveMatch:
             westLive = True
 
-        return (show, episode, quality, reencode, uncensored, westLive)
+        # We normalize 'show' case because we rely on the sqlite3
+        # uniqueness constaints to prevent duplicate downloads, but some
+        # episodes are posted multiple times with multiple cases (e.g.
+        # sometimes And or With are capitalized, othertimes not, and then
+        # we get duplicate downloads of the same episode which is bad
+        # if our network connections have data caps).
+        return (show.title(), episode, quality, reencode, uncensored, westLive)
 
     def qualifiesForSelection(self, filename):
         def fileAlreadySelected(details):
