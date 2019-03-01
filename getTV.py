@@ -177,6 +177,7 @@ class TVTorrentController:
         self.userpass = ""
         self.downloadQuality = [720, 1080]
         self.speakDownload = True
+        self.qualityOverride = {}
 
         # We don't retain 'proxs' or 'requestsFromSource' in this
         # instance since they get stored/retained inside TorrentApiController
@@ -287,9 +288,24 @@ class TVTorrentController:
                     # so strip filename-interfering punctuation
                     showNameFromFile = re.sub(r"['.]", "", showNameFromFile)
 
+                    # If show has a quality override identifier, store into
+                    # quality override dict (and repair name for s.append())
+                    if "-" in showNameFromFile:
+                        # Format of override is (example):
+                        # show name anything - 1080p
+                        match = r"\s?-\s?(720|1080|2160)p"
+                        foundOverride = re.search(match, showNameFromFile)
+                        if foundOverride:
+                            # Remove quality identifier from compare name
+                            showNameFromFile = re.sub(
+                                match, '', showNameFromFile)
+
+                            # Store quality override for later usage
+                            self.qualityOverride[showNameFromFile] = [
+                                int(foundOverride.group(1))]
+
                     # Allow for case insensitive name matches so users
                     # don't have to worry about names like "iZombie, ONeals"
-                    # etc
                     s.append(showNameFromFile.lower())
 
         # Sort here because we use a binary search to narrow down selections
@@ -414,11 +430,21 @@ class TVTorrentController:
         else:
             return False
 
-        if quality in self.downloadQuality:
+        def downloadThisFile():
             if fileAlreadySelected(details):
                 print("Skipping {} {} ({})".format(show, episode, quality))
                 return False
             return True
+
+        # abstraction leakage; our override names are lowercase
+        # because that's how we're comparing them on injest from user
+        checkOverrideShowName = show.lower()
+        if checkOverrideShowName in self.qualityOverride:
+            if quality in self.qualityOverride[checkOverrideShowName]:
+                return downloadThisFile()
+
+        if quality in self.downloadQuality:
+            return downloadThisFile()
 
         return False
 
