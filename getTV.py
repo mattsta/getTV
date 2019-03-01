@@ -72,7 +72,9 @@ class TorrentApiController:
                 print("Connection error when attempting to fetch API token")
                 time.sleep(5)
                 continue
+
             self.tokenAcquiredAt = time.time()
+
             if r.status_code != 200:
                 # The API is fronted by cloudflare. Sometimes cloudflare
                 # throws up a captcha, which is annoying on remote servers,
@@ -83,6 +85,7 @@ class TorrentApiController:
                 # options under [network].
                 with open("output.html", "w") as err:
                     err.write(r.text)
+
                 sys.exit("Error getting API token. "
                          "Wrote error to output.html")
             j = r.json()
@@ -120,6 +123,7 @@ class TorrentApiController:
                 print("Connection error when attempting to fetch episodes")
                 time.sleep(5)
                 continue
+
             try:
                 j = r.json()
             except BaseException:
@@ -154,6 +158,7 @@ class TorrentApiController:
                 #   - 'filename'
                 #   - 'download' (the magnet link)
                 return results
+
             print("torrent_results not found in JSON. Retrying.")
             time.sleep(5)
 
@@ -554,6 +559,7 @@ if __name__ == "__main__":
                 time.sleep(1)
 
         intervalToCheckForNewEpisodes = args.interval
+
         while True:
             countdown(intervalToCheckForNewEpisodes)
             runner.selectNewEpisodes()
