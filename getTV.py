@@ -86,8 +86,12 @@ class TorrentApiController:
                 with open("output.html", "w") as err:
                     err.write(r.text)
 
-                sys.exit("Error getting API token. "
-                         "Wrote error to output.html")
+                # Back off longer and wait for service to hopefully recover
+                print("Error getting API token. "
+                      "Wrote error to output.html")
+
+                time.sleep(300)
+
             j = r.json()
             if "token" in j:
                 self.token = j["token"]
