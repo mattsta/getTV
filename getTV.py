@@ -473,6 +473,7 @@ class TVTorrentController:
         # of 425 lookups per run
         # (100 API results * log(70 shows in show list) = 424.85).
         def showExistsInShowList(shows, filename):
+            # 'lowerFile' is the inbound filename we are searching for a match
             # lower() because we want case insensitive matches and we already
             # lower()'d the entire SHOWS list when we parsed it.
             # Replacing dots because our show names are space delimited.
@@ -484,9 +485,18 @@ class TVTorrentController:
                 #  filenames always sort +1 higher than the show name itself)
                 showPosition -= 1
 
-            # Verify sorted position we found is a reasonable match
-            # for the filename given.
-            if lowerFile.startswith(shows[showPosition]):
+            # Extracted selected binary search'd shows from 'shows'
+            currentShow = shows[showPosition]
+
+            # Check if inbound filename is a prefix match of the binary search
+            # location selected by bisect_left()
+            if lowerFile.startswith(currentShow):
+                # If show has a "DO NOT PERFORM A PREFIX MATCH" designator,
+                # verify the match is exact and NOT just a prefix of longer
+                # name
+                if currentShow.endswith("$") and lowerFile != currentShow:
+                    return False
+
                 return True
 
             return False
