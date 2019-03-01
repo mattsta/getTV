@@ -80,7 +80,7 @@ class TorrentApiController:
                 # If you get stuck by a cloudflare captcha block on your server,
                 # look into using a proxy instead.  See configuration file
                 # options under [network].
-                with file("output.html", "w") as err: err.write(r.text)
+                with open("output.html", "w") as err: err.write(r.text)
                 sys.exit("Error getting API token. "
                          "Wrote error to output.html")
             j = r.json()
