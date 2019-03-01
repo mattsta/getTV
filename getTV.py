@@ -21,12 +21,13 @@ from requests_toolbelt.adapters.source import SourceAddressAdapter
 
 system = platform.system()
 
+
 class TorrentApiController:
     def __init__(self, request, proxies={}):
         # API docs: https://torrentapi.org/apidocs_v2.txt
         self.BASE = "https://torrentapi.org/pubapi_v2.php?app_id=getTV&"
         self.token = None
-        self.requestsFromSource = request # must conform to 'requests' API
+        self.requestsFromSource = request  # must conform to 'requests' API
         self.proxs = proxies
         self.tokenAcquiredAt = None
 
@@ -67,7 +68,7 @@ class TorrentApiController:
             except KeyboardInterrupt:
                 # Allow CTRL-C during downloads
                 raise
-            except:
+            except BaseException:
                 print("Connection error when attempting to fetch API token")
                 time.sleep(5)
                 continue
@@ -80,7 +81,8 @@ class TorrentApiController:
                 # If you get stuck by a cloudflare captcha block on your server,
                 # look into using a proxy instead.  See configuration file
                 # options under [network].
-                with open("output.html", "w") as err: err.write(r.text)
+                with open("output.html", "w") as err:
+                    err.write(r.text)
                 sys.exit("Error getting API token. "
                          "Wrote error to output.html")
             j = r.json()
@@ -114,17 +116,16 @@ class TorrentApiController:
             except KeyboardInterrupt:
                 # Allow CTRL-C during downloads
                 raise
-            except:
+            except BaseException:
                 print("Connection error when attempting to fetch episodes")
                 time.sleep(5)
                 continue
             try:
                 j = r.json()
-            except:
+            except BaseException:
                 print("JSON Parsing error...", r.text)
                 time.sleep(5)
                 continue
-
 
             # Manually check for token error because sometimes 15 minute tokens
             # don't seem to last for 15 minutes.
@@ -173,11 +174,16 @@ class TVTorrentController:
         requestsFromSource = requests.Session()
 
         self.establishConfiguration(config, requestsFromSource, proxs)
-        self.torrentController = TorrentApiController(requestsFromSource, proxs)
+        self.torrentController = TorrentApiController(
+            requestsFromSource, proxs)
 
         self.establishDatabase()
 
-    def establishConfiguration(self, configFilename, requestsFromSource, proxs):
+    def establishConfiguration(
+            self,
+            configFilename,
+            requestsFromSource,
+            proxs):
         config = configparser.SafeConfigParser(allow_no_value=True)
 
         configFilenameLocal = configFilename + ".local"
@@ -190,7 +196,7 @@ class TVTorrentController:
             print("Using config files {} and {}".format(configFilename,
                                                         configFilenameLocal))
             config.read([configFilename, configFilenameLocal])
-        except:
+        except BaseException:
             print("Configuration file error. Running with defaults.")
             return
 
@@ -239,7 +245,7 @@ class TVTorrentController:
                               (show, episode, quality, reencode,
                                uncensored, westlive)''')
             self.conn.commit()
-        except:
+        except BaseException:
             pass
 
     def fetchEpisodeList(self):
@@ -272,7 +278,8 @@ class TVTorrentController:
                     showNameFromFile = re.sub(r"['.]", "", showNameFromFile)
 
                     # Allow for case insensitive name matches so users
-                    # don't have to worry about names like "iZombie, ONeals" etc
+                    # don't have to worry about names like "iZombie, ONeals"
+                    # etc
                     s.append(showNameFromFile.lower())
 
         # Sort here because we use a binary search to narrow down selections
@@ -307,7 +314,8 @@ class TVTorrentController:
         uncensored = False
         westLive = False
 
-        # Show name is immediately before the S00E00 or date marker (2016.01.01)
+        # Show name is immediately before the S00E00 or date marker
+        # (2016.01.01)
         nameMatch = re.match(r"(.*?)\.(\d\d\d\d|S\d\d)", filename)
         if not nameMatch:
             return None
@@ -362,7 +370,7 @@ class TVTorrentController:
         # gets tagged with a WEST identifier and the same episode number.
         westLiveMatch = re.search(r"WEST\.FEED", filename)
         if westLiveMatch:
-             westLive = True
+            westLive = True
 
         return (show, episode, quality, reencode, uncensored, westLive)
 
@@ -451,7 +459,7 @@ class TVTorrentController:
             self.conn.commit()
 
         # Fetch most recent 100 tv torrents from provider
-        print("Asking TV torrent API for list of shows ready for download...");
+        print("Asking TV torrent API for list of shows ready for download...")
         start = time.time()
         results = self.fetchEpisodeList()
         end = time.time()
@@ -463,8 +471,8 @@ class TVTorrentController:
         shows = self.loadShowList()
         end = time.time()
         print("Loaded {1} file in {0:.2f} milliseconds".format(
-                                                        (end - start) * 1e3,
-                                                        self.showsFilename))
+            (end - start) * 1e3,
+            self.showsFilename))
 
         for result in results:
             filename = result["filename"]
@@ -485,11 +493,11 @@ class TVTorrentController:
                         # On OS X, open magnet links directly with whichever
                         # app is registered for the filetype with the OS.
                         subprocess.check_call(["/usr/bin/open",
-                                               '-g', # don't bring to foreground
+                                               '-g',  # don't bring to foreground
                                                magnetLink])
                         if self.speakDownload:
                             # Note: no error checking here because 'say'
-                            #       failure doesn't impact link opening success.
+                            # failure doesn't impact link opening success.
                             subprocess.call(["/usr/bin/say",
                                              "Downloading {}".format(show)])
                     elif system == "Linux":
@@ -508,6 +516,7 @@ class TVTorrentController:
                 recordSelection(details)
         completedAt = str(datetime.datetime.now())
         print("Done processing shows at", completedAt)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -538,7 +547,7 @@ if __name__ == "__main__":
         def countdown(seconds):
             print("")
             for i in range(seconds, 0, -1):
-                print(' ' * 44, end='\r') # clear width of string below
+                print(' ' * 44, end='\r')  # clear width of string below
                 print('{} seconds until next download attempt...'.format(i),
                       end="\r")
                 sys.stdout.flush()
