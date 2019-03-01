@@ -118,7 +118,13 @@ class TorrentApiController:
                 print("Connection error when attempting to fetch episodes")
                 time.sleep(5)
                 continue
-            j = r.json()
+            try:
+                j = r.json()
+            except:
+                print("JSON Parsing error...", r.text)
+                time.sleep(5)
+                continue
+
 
             # Manually check for token error because sometimes 15 minute tokens
             # don't seem to last for 15 minutes.
