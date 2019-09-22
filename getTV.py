@@ -32,9 +32,7 @@ class TorrentApiController:
         self.tokenAcquiredAt = None
 
     def get(self, url):
-        return self.requestsFromSource.get(url,
-                                           proxies=self.proxs,
-                                           timeout=(5, 5))
+        return self.requestsFromSource.get(url, proxies=self.proxs, timeout=(5, 5))
 
     def invalidateToken(self):
         self.token = None
@@ -87,8 +85,7 @@ class TorrentApiController:
                     err.write(r.text)
 
                 # Back off longer and wait for service to hopefully recover
-                print("Error getting API token. "
-                      "Wrote error to output.html")
+                print("Error getting API token. " "Wrote error to output.html")
 
                 time.sleep(300)
 
@@ -111,11 +108,13 @@ class TorrentApiController:
             # expires during an error condition, we need to generate a
             # new token and a new URL instead of infinite looping with an
             # expired token that'll never return new results.
-            MOST_RECENT_100 = {"mode": "list",
-                               "category": category,
-                               "sort": "last",
-                               "limit": "100",
-                               "token": self.getToken()}
+            MOST_RECENT_100 = {
+                "mode": "list",
+                "category": category,
+                "sort": "last",
+                "limit": "100",
+                "token": self.getToken(),
+            }
             mostRecentURL = self.BASE + urllib.parse.urlencode(MOST_RECENT_100)
 
             try:
@@ -155,8 +154,7 @@ class TorrentApiController:
                 #            if filename has multiple releases across multiple
                 #            groups, longer filename will sort after shorter
                 #            name regardless of prefix/resolution matching.
-                results = sorted(j["torrent_results"],
-                                 key=itemgetter('filename'))
+                results = sorted(j["torrent_results"], key=itemgetter("filename"))
 
                 # We're consuming exactly the JSON returned by the API without
                 # any provider-independent intermediate representation.
@@ -189,27 +187,24 @@ class TVTorrentController:
         requestsFromSource = requests.Session()
 
         self.establishConfiguration(config, requestsFromSource, proxs)
-        self.torrentController = TorrentApiController(
-            requestsFromSource, proxs)
+        self.torrentController = TorrentApiController(requestsFromSource, proxs)
 
         self.establishDatabase()
 
-    def establishConfiguration(
-            self,
-            configFilename,
-            requestsFromSource,
-            proxs):
+    def establishConfiguration(self, configFilename, requestsFromSource, proxs):
         config = configparser.SafeConfigParser(allow_no_value=True)
 
         configFilenameLocal = configFilename + ".local"
-        if not (os.path.isfile(configFilename) or
-                os.path.isfile(configFilenameLocal)):
+        if not (os.path.isfile(configFilename) or os.path.isfile(configFilenameLocal)):
             print("Configuration file(s) not found. Running with defaults.")
             return
 
         try:
-            print("Using config files {} and {}".format(configFilename,
-                                                        configFilenameLocal))
+            print(
+                "Using config files {} and {}".format(
+                    configFilename, configFilenameLocal
+                )
+            )
             config.read([configFilename, configFilenameLocal])
         except BaseException:
             print("Configuration file error. Running with defaults.")
@@ -218,31 +213,32 @@ class TVTorrentController:
         def getOrNot(section, field):
             return config.get(section, field, fallback=None)
 
-        self.transmissionHostRemote = getOrNot('remote', 'host')
+        self.transmissionHostRemote = getOrNot("remote", "host")
 
-        username = getOrNot('remote', 'username')
-        password = getOrNot('remote', 'password')
+        username = getOrNot("remote", "username")
+        password = getOrNot("remote", "password")
         self.userpass = "{}:{}".format(username, password)
 
-        self.sourceIP = getOrNot('network', 'fetchFromSourceIP')
-        proxs['https'] = getOrNot('network', 'proxy')
+        self.sourceIP = getOrNot("network", "fetchFromSourceIP")
+        proxs["https"] = getOrNot("network", "proxy")
 
-        self.dbFilename = getOrNot('files', 'db')
-        self.showsFilename = getOrNot('files', 'shows')
+        self.dbFilename = getOrNot("files", "db")
+        self.showsFilename = getOrNot("files", "shows")
 
-        self.speakDownload = config.getboolean('content', 'speakDownload',
-                                               fallback=False)
+        self.speakDownload = config.getboolean(
+            "content", "speakDownload", fallback=False
+        )
 
-        resolutions = getOrNot('content', 'quality')
+        resolutions = getOrNot("content", "quality")
         if resolutions:
             # Strip 'p' if users entered '720p 1080p'
             # Convert strings to integers because we compare using math
-            self.downloadQuality = [int(r) for r in
-                                    resolutions.replace("p", "").split(" ")]
+            self.downloadQuality = [
+                int(r) for r in resolutions.replace("p", "").split(" ")
+            ]
 
         # Bind specific source interface to https requestor (or not)
-        requestsFromSource.mount("https://",
-                                 SourceAddressAdapter(self.sourceIP or ""))
+        requestsFromSource.mount("https://", SourceAddressAdapter(self.sourceIP or ""))
 
     def establishDatabase(self):
         self.conn = sqlite3.connect(self.dbFilename)
@@ -250,15 +246,19 @@ class TVTorrentController:
 
         # Always try to create the database; it's a no-op if already exists
         try:
-            self.c.execute('''CREATE TABLE episodes
+            self.c.execute(
+                """CREATE TABLE episodes
                               (show, episode, quality, reencode,
                                uncensored, westlive,
                                UNIQUE (show, episode, quality, reencode,
                                        uncensored, westlive)
-                               ON CONFLICT ABORT)''')
-            self.c.execute('''CREATE INDEX epidx ON episodes
+                               ON CONFLICT ABORT)"""
+            )
+            self.c.execute(
+                """CREATE INDEX epidx ON episodes
                               (show, episode, quality, reencode,
-                               uncensored, westlive)''')
+                               uncensored, westlive)"""
+            )
             self.conn.commit()
         except BaseException:
             pass
@@ -301,12 +301,12 @@ class TVTorrentController:
                         foundOverride = re.search(match, showNameFromFile)
                         if foundOverride:
                             # Remove quality identifier from compare name
-                            showNameFromFile = re.sub(
-                                match, '', showNameFromFile)
+                            showNameFromFile = re.sub(match, "", showNameFromFile)
 
                             # Store quality override for later usage
                             self.qualityOverride[showNameFromFile] = [
-                                int(foundOverride.group(1))]
+                                int(foundOverride.group(1))
+                            ]
 
                     # Allow for case insensitive name matches so users
                     # don't have to worry about names like "iZombie, ONeals"
@@ -393,8 +393,7 @@ class TVTorrentController:
         # has been previously downloaded. Typically gets posted a few days
         # to a week after the original TV airing
         # (as happens with southpark, mr robot, etc).
-        uncensoredMatch = re.search(r"UNCENSORED", filename,
-                                    flags=re.IGNORECASE)
+        uncensoredMatch = re.search(r"UNCENSORED", filename, flags=re.IGNORECASE)
         if uncensoredMatch:
             uncensored = True
 
@@ -424,13 +423,19 @@ class TVTorrentController:
             #     - OR -
             #   - needs to download anyway because we have extra tags tag due
             #     to an alternate encoding/release with different material
-            if self.c.execute('''SELECT * FROM episodes WHERE
+            if (
+                self.c.execute(
+                    """SELECT * FROM episodes WHERE
                                  show=? AND
                                  episode=? AND
                                  quality >= ? AND
                                  reencode >= ? AND
                                  uncensored=? AND
-                                 westlive=?''', details) and self.c.fetchone():
+                                 westlive=?""",
+                    details,
+                )
+                and self.c.fetchone()
+            ):
                 return True
 
             # else, the combination of show+ep (from 'filename') hasn't been
@@ -514,8 +519,7 @@ class TVTorrentController:
         """ The main selection processor """
 
         def recordSelection(details):
-            self.c.execute('INSERT INTO episodes VALUES (?, ?, ?, ?, ?, ?)',
-                           details)
+            self.c.execute("INSERT INTO episodes VALUES (?, ?, ?, ?, ?, ?)", details)
             self.conn.commit()
 
         # Fetch most recent 100 tv torrents from provider
@@ -523,16 +527,17 @@ class TVTorrentController:
         start = time.time()
         results = self.fetchEpisodeList()
         end = time.time()
-        print("Downloaded current episode list in {:.2f} seconds".format(
-              (end - start)))
+        print("Downloaded current episode list in {:.2f} seconds".format((end - start)))
 
         # Read local SHOWS text file (or its override file)
         start = time.time()
         shows = self.loadShowList()
         end = time.time()
-        print("Loaded {1} file in {0:.2f} milliseconds".format(
-            (end - start) * 1e3,
-            self.showsFilename))
+        print(
+            "Loaded {1} file in {0:.2f} milliseconds".format(
+                (end - start) * 1e3, self.showsFilename
+            )
+        )
 
         for result in results:
             filename = result["filename"]
@@ -552,20 +557,31 @@ class TVTorrentController:
                     if system == "Darwin":
                         # On OS X, open magnet links directly with whichever
                         # app is registered for the filetype with the OS.
-                        subprocess.check_call(["/usr/bin/open",
-                                               '-g',  # don't bring to foreground
-                                               magnetLink])
+                        subprocess.check_call(
+                            [
+                                "/usr/bin/open",
+                                "-g",  # don't bring to foreground
+                                magnetLink,
+                            ]
+                        )
                         if self.speakDownload:
                             # Note: no error checking here because 'say'
                             # failure doesn't impact link opening success.
-                            subprocess.call(["/usr/bin/say",
-                                             "Downloading {}".format(show)])
+                            subprocess.call(
+                                ["/usr/bin/say", "Downloading {}".format(show)]
+                            )
                     elif system == "Linux":
                         # On Linux, connect to transmission-daemon remotely
-                        subprocess.check_call(["transmission-remote",
-                                               self.transmissionHostRemote,
-                                               '-n', self.userpass,
-                                               '-a', magnetLink])
+                        subprocess.check_call(
+                            [
+                                "transmission-remote",
+                                self.transmissionHostRemote,
+                                "-n",
+                                self.userpass,
+                                "-a",
+                                magnetLink,
+                            ]
+                        )
                 except subprocess.CalledProcessError:
                     # Either opening the link or connecting to remote
                     # transmission instance failed, so don't record this
@@ -580,21 +596,23 @@ class TVTorrentController:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", "--config",
-                        help="config filename (default: tv.conf)",
-                        default="tv.conf")
-    parser.add_argument("-f",
-                        "--forever",
-                        help="continuously check for new episodes "
-                             "(default: off)",
-                        default=False,
-                        action="store_true")
-    parser.add_argument("-i",
-                        "--interval",
-                        type=int,
-                        help="seconds between new episode queries "
-                             " in forever mode (default: 120)",
-                        default=120)
+    parser.add_argument(
+        "-c", "--config", help="config filename (default: tv.conf)", default="tv.conf"
+    )
+    parser.add_argument(
+        "-f",
+        "--forever",
+        help="continuously check for new episodes " "(default: off)",
+        default=False,
+        action="store_true",
+    )
+    parser.add_argument(
+        "-i",
+        "--interval",
+        type=int,
+        help="seconds between new episode queries " " in forever mode (default: 120)",
+        default=120,
+    )
 
     args = parser.parse_args()
     config = args.config
@@ -604,12 +622,12 @@ if __name__ == "__main__":
 
     forever = args.forever
     if forever:
+
         def countdown(seconds):
             print("")
             for i in range(seconds, 0, -1):
-                print(' ' * 44, end='\r')  # clear width of string below
-                print('{} seconds until next download attempt...'.format(i),
-                      end="\r")
+                print(" " * 44, end="\r")  # clear width of string below
+                print("{} seconds until next download attempt...".format(i), end="\r")
                 sys.stdout.flush()
                 time.sleep(1)
 
