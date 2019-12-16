@@ -10,75 +10,180 @@
 # blank lines are allowed
 
 # Longer lived shows
-12 Monkeys
+#12 Monkeys
 American Horror Story
-Z Nation
+#Z Nation
 Lucifer
 Black Mirror
-iZombie
+#iZombie
 The Simpsons
 Family Guy
 South Park
 Whose Line
 Penn and Teller
-Last Week
 Real Time
 Saturday Night Live
-Adventure Time
+#Adventure Time
 Steven Universe
 Brooklyn
 American Dad
 Billions
-Dr Ken
+#Dr Ken
 Hollywood Game
-The Magicians
-The Real ONeals
+The Magicians - 1080p
+#The Real ONeals
 How to Get Away with Murder
 Better Call Saul
 Chicago Med
-The Shannara
-The Librarians
+#The Shannara
+#The Librarians
 Doctor Who
-Jessica Jones
-Ash vs Evil Dead
-Please Like Me
-Blunt Talk
+#Jessica Jones
+#Ash vs Evil Dead
+#Please Like Me
+#Blunt Talk
 Last Week Tonight
-Rosewood
-VICE
+#Rosewood
 Full Frontal
 Superstore
-House of Cards
-Unbreakable Kimmy
-The Strain
+#House of Cards
+#Unbreakable Kimmy
 My Little
-Voltron
+#Voltron
+Charlie Brookers
 
 # New 2016 Shows
-Designated Survivor
-Class
-Incorporated
 The Good Place
 Channel Zero
-Timeless
-No Tomorrow
-Dirk Gentlys Holistic Detective Agency
-Braindead
+#Timeless
+#Dirk Gentlys Holistic Detective Agency
 American Gods
-Son of Zorn
-People of Earth
+#People of Earth
 Westworld
-Stan Against Evil
-Tutankhamun
-Chance
-Salvation
+#Stan Against Evil
+#Chance
+#Salvation
+#Nightcap
+#Mars
+#Travelers
+Good Behavior
+#Riverdale
+#Beyond
+#Sherlock
+ConMan
+#The Path
 
 # Final Season Shows
-The Leftovers
-The Vampire Diaries
-Teen Wolf
+#The Leftovers
+#The Vampire Diaries
+#Teen Wolf
+#No Tomorrow
 
 # Shows not existing yet
 Criminal Magic
 Stranger in a Strange Land
 The Building
+Hacktivist
+The Woods
+#Powerless
+#Great News
+DuckTales
+#Hard Sun
+#The Young Pope
+#Legion
+
+The Tick
+
+#Veep
+Silicon Valley
+
+#So You Think
+
+Ghosted
+
+#Scream
+
+Rick and
+
+#Once Upon
+
+The Orville - 1080p
+
+#The Exor
+
+Star Trek Discovery - 1080p
+
+#Future Man
+
+Will and Grace
+
+The Good Doctor
+The Resident
+Constantine
+#Stargate
+Mr Robot - 1080p
+Psych
+#The X-Files
+
+#LA to Vegas
+
+9-1-1
+
+Fate
+Kokkoku
+
+#The End of The
+
+A P Bio
+#Champions
+#Counterpart
+
+#Problem Areas
+#V-Wars
+Ancient Aliens
+New Amsterdam
+Evil Genius
+The True Story Of
+#The Break
+
+The Hunt
+FLCL
+Disenchantment
+Strange Angel
+#The Fourth Estate
+#Big Hero 6
+#Summer Camp Island
+KAOS
+Bobcat
+Castle Rock
+
+The Nevers
+#Who is America
+Titans
+
+Devs
+#Murphy Brown
+God Friended Me
+#Patriot Act
+Living With Yourself
+
+Tom Clancys Jack Ryan
+
+Prodigal Son
+Evil
+
+# Scheduled 2020!
+Solar Opposites
+
+Mindhunter
+
+# We force YOU to not prefix match so we don't download garbage
+# shows just happening to prefix match it
+# (e.g. Young Sheldon, Young Justice, ...)
+YOU$
+
+His Dark
+
+The Chilling Adventures of Sabrina
+Raised by Wolves
+The Twilight Zone
