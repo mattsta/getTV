@@ -19,6 +19,8 @@ from operator import itemgetter
 import requests
 from requests_toolbelt.adapters.source import SourceAddressAdapter
 
+import webScrapeFetch
+
 system = platform.system()
 
 
@@ -171,7 +173,7 @@ class TorrentApiController:
 
 
 class TVTorrentController:
-    def __init__(self, config):
+    def __init__(self, config, mode):
         self.dbFilename = "downloads.db"
         self.showsFilename = "SHOWS"
         self.sourceIP = ""
@@ -180,6 +182,7 @@ class TVTorrentController:
         self.downloadQuality = [720, 1080]
         self.speakDownload = True
         self.qualityOverride = {}
+        self.mode = mode
 
         # We don't retain 'proxs' or 'requestsFromSource' in this
         # instance since they get stored/retained inside TorrentApiController
@@ -525,7 +528,10 @@ class TVTorrentController:
         # Fetch most recent 100 tv torrents from provider
         print("Asking TV torrent API for list of shows ready for download...")
         start = time.time()
-        results = self.fetchEpisodeList()
+        if self.mode == "api":
+            results = self.fetchEpisodeList()
+        else:
+            results = webScrapeFetch.fetchEpisodeList()
         end = time.time()
         print("Downloaded current episode list in {:.2f} seconds".format((end - start)))
 
@@ -539,6 +545,14 @@ class TVTorrentController:
             )
         )
 
+        def getLinkForFilename(result, filename):
+            # API mode has URL directly in the result
+            if self.mode == "api":
+                return result["download"]
+
+            # Scaper has to fetch URL from another web request
+            return webScrapeFetch.magnetLinkFromURL(result["episodePage"])
+
         for result in results:
             filename = result["filename"]
 
@@ -547,7 +561,7 @@ class TVTorrentController:
                 (show, episode, quality, _, _, _) = details
 
                 # Verify the link is properly formed
-                magnetLink = result["download"]
+                magnetLink = getLinkForFilename(result, filename)
                 if not magnetLink.startswith("magnet:?"):
                     continue
 
@@ -617,7 +631,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     config = args.config
 
-    runner = TVTorrentController(config)
+    runner = TVTorrentController(config, mode="scrape")
     runner.selectNewEpisodes()
 
     forever = args.forever
